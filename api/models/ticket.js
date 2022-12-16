@@ -14,6 +14,10 @@ const ticketSchema = mongoose.Schema(
         type: Schema.ObjectId,
         ref: 'match',
         required: true
+    },
+    seatNumber: {
+        type: Integer,
+        required: true
     }
   },
   { timestamps: { createdAt: "created_at" } }
