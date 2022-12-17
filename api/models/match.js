@@ -38,7 +38,10 @@ const matchSchema = mongoose.Schema(
     dateTime: {
         type: Date,
         required: true
-    }
+    },
+    seats: [{
+        type: Integer
+    }]  
   },
   { timestamps: { createdAt: "created_at" } }
 );
@@ -46,5 +49,3 @@ const matchSchema = mongoose.Schema(
 
 const Match = mongoose.model("match", matchSchema);
 module.exports = Match;
-
-
