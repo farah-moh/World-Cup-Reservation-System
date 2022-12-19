@@ -1,4 +1,5 @@
 const Match = require("../models/match");
+const Stadium = require("../models/stadium");
 const jwt = require("jsonwebtoken");
 
 const UserVerification = require("../models/userVerfication");
@@ -37,7 +38,7 @@ exports.getMatch = async (req, res) => {
 
 exports.createMatch = async (req, res) => {
     try {
-        const match = await Match.create({ ...req.body, verified: false });
+        const match = await Match.create(req.body);
         return res.json(match);
     } catch (err) {
         return res.status(400).json({ message: err.message });

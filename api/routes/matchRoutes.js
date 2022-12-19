@@ -7,7 +7,7 @@ const router = express.Router({mergeParams: true});
 router.get('/match/:id', matchController.getMatch);
 router.get('/match', matchController.getFutureMatches);
 
-router.use(authenticationController.protect); //TODO: change to protectManager
+//router.use(authenticationController.protectManager); //TODO: change to protectManager
 router.post('/match', matchController.createMatch);
 
 module.exports = router;
