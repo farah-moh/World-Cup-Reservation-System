@@ -16,7 +16,7 @@ const ticketSchema = mongoose.Schema(
         required: true
     },
     seatNumber: {
-        type: Integer,
+        type: Number,
         required: true
     }
   },

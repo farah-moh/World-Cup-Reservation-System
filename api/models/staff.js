@@ -20,5 +20,5 @@ const staffSchema = mongoose.Schema(
 );
 
 
-const Staff = mongoose.model("team", staffSchema);
+const Staff = mongoose.model("staff", staffSchema);
 module.exports = Staff;

@@ -6,19 +6,19 @@ const Schema = mongoose.Schema;
 const stadiumSchema = mongoose.Schema(
   {
     length: {
-      type: Integer,
+      type: Number,
       required: true
     },
     width: {
-        type: Integer,
+        type: Number,
         required: true
     },
     rows: {
-        type: Integer,
+        type: Number,
         required: true
     },
     seatsPerRow: {
-        type: Integer,
+        type: Number,
         required: true
     }
   },
