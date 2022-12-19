@@ -45,8 +45,8 @@ app.use((req, res, next) => {
 });
 
 // Routes which should handle requests
-app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/", userRoutes);
 
 app.use((req, res, next) => {
   const error = new Error();
