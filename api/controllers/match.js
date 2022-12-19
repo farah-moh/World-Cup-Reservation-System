@@ -5,7 +5,7 @@ const UserVerification = require("../models/userVerfication");
 const { model } = require("mongoose");
 
 exports.getMatches = async (req, res) => {
-    let fromDate = new Date(-8640000000000000); //they aren't looking at code right?
+    let fromDate = new Date(-8640000000000000); //they aren't looking at code right? yes lol
     let toDate = new Date(8640000000000000);
 
     if (req.body.hasOwnProperty('fromDate'))

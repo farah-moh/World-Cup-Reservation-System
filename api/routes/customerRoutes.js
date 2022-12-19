@@ -6,4 +6,6 @@ const router = express.Router({mergeParams: true});
 
 router.use(authenticationController.protect);
 
-router.get('/reservations',customerController.getReservations);
+router.get('/:username/reservations',customerController.getReservations);
+
+module.exports = router;

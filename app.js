@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 const userRoutes = require("./api/routes/userRoutes");
 const adminRoutes = require("./api/routes/adminRoutes");
 const matchRoutes = require("./api/routes/matchRoutes");
+const customerRoutes = require("./api/routes/customerRoutes");
 
 require("dotenv").config();
 
@@ -47,8 +48,9 @@ app.use((req, res, next) => {
 
 // Routes which should handle requests
 app.use("/api/admin", adminRoutes);
-app.use("/api/", matchRoutes);
+app.use("/api/match", matchRoutes);
 app.use("/api/", userRoutes);
+app.use("/api/", customerRoutes);
 
 app.use((req, res, next) => {
   const error = new Error();

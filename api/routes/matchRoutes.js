@@ -4,10 +4,10 @@ const matchController = require('./../controllers/match');
 
 const router = express.Router({mergeParams: true});
 
-router.get('/match/:id', matchController.getMatch);
-router.get('/match', matchController.getFutureMatches);
+router.get('/:id', matchController.getMatch);
+router.get('/', matchController.getFutureMatches);
 
-router.use(authenticationController.protect); //TODO: change to protectManager
-router.post('/match', matchController.createMatch);
+router.use(authenticationController.protectManager); 
+router.post('/create', matchController.createMatch);
 
 module.exports = router;

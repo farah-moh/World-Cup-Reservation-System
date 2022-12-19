@@ -55,6 +55,30 @@ const protectServiceAdmin = async req => {
     req.user = foundUser;
   };
   
+  const protectServiceManager = async req => {
+    let token = null;
+    //getting token from header & removing bearer
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+  
+    if (!token) {
+      throw new AppError('You are not logged in! Please log in to access.', 401);
+    }
+    //verifying token
+    const verified = await promisify(jwt.verify)(token, process.env.JWT_SECRET) // error handling
+    //finding user from token
+    const foundUser = await user.findById(verified._id);
+    
+    if(!foundUser) {
+      throw new AppError('The user belonging to this token no longer exists', 401);
+    }
+    if(foundUser.role !== 'manager') {
+      throw new AppError('The user is not an admin', 401);
+    }
+    req.user = foundUser;
+  };
+
   exports.protect = catchAsync(async (req, res, next) => {
     await protectService(req);
     next();
@@ -62,5 +86,10 @@ const protectServiceAdmin = async req => {
   
   exports.protectAdmin = catchAsync(async (req, res, next) => {
     await protectServiceAdmin(req);
+    next();
+  });
+
+  exports.protectManager = catchAsync(async (req, res, next) => {
+    await protectServiceManager(req);
     next();
   });
