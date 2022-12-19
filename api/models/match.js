@@ -46,6 +46,26 @@ const matchSchema = mongoose.Schema(
   { timestamps: { createdAt: "created_at" } }
 );
 
+matchSchema.pre("save", async function (next) {
+    const Stadium = require("../models/stadium");
+    const match = this;
+    const stadium = match.stadium._id;
+    const res = await Stadium.findById(stadium);
+    if (!res){
+        throw new Error ("Stadium not found");
+    }
+    let lower = new Date(match.dateTime.getTime() - 90 * 60000);//a match is 90 minutes
+    let upper = new Date(match.dateTime.getTime() + 90 * 60000);
+    const res2 = await Match.findOne({
+        'stadium' : stadium,
+        'dateTime' : {$gt: lower, $lt: upper} 
+    });
+    if (res2){
+        throw new Error ("Stadium is occupied");
+    }
+    //TODO: other checks
+    next();
+});
 
 const Match = mongoose.model("match", matchSchema);
 module.exports = Match;
