@@ -74,7 +74,7 @@ const protectServiceAdmin = async req => {
       throw new AppError('The user belonging to this token no longer exists', 401);
     }
     if(foundUser.role !== 'manager') {
-      throw new AppError('The user is not an admin', 401);
+      throw new AppError('The user is not a manager', 401);
     }
     req.user = foundUser;
   };
