@@ -7,7 +7,7 @@ const router = express.Router({mergeParams: true});
 router.get('/:id', matchController.getMatch);
 router.get('/', matchController.getFutureMatches);
 
-router.use(authenticationController.protectManager); 
+//router.use(authenticationController.protectManager); 
 router.post('/create', matchController.createMatch);
 
 module.exports = router;

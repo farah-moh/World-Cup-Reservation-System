@@ -13,12 +13,12 @@ const matchSchema = mongoose.Schema(
     firstTeam: {
         type: Schema.ObjectId,
         ref: 'team',
-        required: true
+        //required: true
     },
     secondTeam: {
         type: Schema.ObjectId,
         ref: 'team',
-        required: true
+        //required: true
     },
     referee: {
         type: Schema.ObjectId,
@@ -41,29 +41,56 @@ const matchSchema = mongoose.Schema(
     },
     seats: [{
         type: Number
-    }]  
+    }],
   },
-  { timestamps: { createdAt: "created_at" } }
+  { timestamps: { createdAt: "created_at" } },
 );
 
 matchSchema.pre("save", async function (next) {
     const Stadium = require("../models/stadium");
     const match = this;
     const stadium = match.stadium._id;
-    const res = await Stadium.findById(stadium);
-    if (!res){
+    const referee = match.referee._id;
+    const firstLinesman = match.firstLinesman._id;
+    const secondLinesman = match.secondLinesman._id;
+
+    const stadiumExists = await Stadium.exists(stadium);
+    if (!stadiumExists){
         throw new Error ("Stadium not found");
     }
-    let lower = new Date(match.dateTime.getTime() - 90 * 60000);//a match is 90 minutes
-    let upper = new Date(match.dateTime.getTime() + 90 * 60000);
-    const res2 = await Match.findOne({
+
+    const matchTime = 90;
+    const lower = new Date(match.dateTime.getTime() - matchTime * 60000);
+    const upper = new Date(match.dateTime.getTime() + matchTime * 60000);
+
+    const stadiumOccupied = await Match.exists({
         'stadium' : stadium,
         'dateTime' : {$gt: lower, $lt: upper} 
     });
-    if (res2){
+    if (stadiumOccupied){
         throw new Error ("Stadium is occupied");
     }
-    //TODO: other checks
+
+    const refereeOccupied = await Match.exists({
+        'referee' : referee,
+        'dateTime' : {$gt: lower, $lt: upper} 
+    });
+    if (refereeOccupied){
+        throw new Error ("Referee is occupied");
+    }
+
+    const linesmanOccupied = await Match.exists({
+        $or: [{'firstLinesman': firstLinesman},
+        {'firstLinesman': secondLinesman}, 
+        {'secondLinesman': firstLinesman},
+        {'secondLinesman': secondLinesman}],
+        'dateTime' : {$gt: lower, $lt: upper} 
+    });
+    if (linesmanOccupied){
+        throw new Error ("Linesman occupied");
+    }
+
+    //TODO: team check
     next();
 });
 
