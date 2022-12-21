@@ -1,5 +1,7 @@
 const Match = require("../models/match");
 const jwt = require("jsonwebtoken");
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 const UserVerification = require("../models/userVerfication");
 const { model } = require("mongoose");
@@ -45,3 +47,30 @@ exports.createMatch = async (req, res) => {
         return res.status(400).json({ message: err.message });
     }
 }
+
+exports.deleteMatch = catchAsync(async (req, res, next) => {
+    
+    let match = req.params.id;
+    match = await Match.findById(match);
+    if(!match) throw new AppError('This match does not exists.',401);
+
+    await match.remove({'_id':match});
+
+    res.status(200).json({
+        success: 'true'
+    });
+});
+
+exports.updateMatch = catchAsync(async (req, res, next) => {
+    
+    let match = req.params.id;
+    match = await Match.findByIdAndUpdate(match, req.body, {
+        new: true
+    });
+    if(!match) throw new AppError('This match does not exists.',401);
+
+    res.status(200).json({
+        success: 'true',
+        match: match
+    });
+});
