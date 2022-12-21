@@ -61,7 +61,7 @@ matchSchema.pre("save", async function (next) {
         throw new AppError("Harry, you are a time traveller!", 400);
     }
 
-    if (firstLinesman.equals(secondLinesman)){
+    if (firstLinesman.equals(secondLinesman) || firstTeam.equals(secondTeam)){
         throw new AppError("You stupid?", 400);
     }
 
