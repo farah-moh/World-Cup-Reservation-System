@@ -48,11 +48,14 @@ const matchSchema = mongoose.Schema(
 matchSchema.pre("save", async function (next) {
     const Stadium = require("../models/stadium");
     const Staff = require("../models/staff");
+    const Team = require("../models/team");
     const match = this;
     const stadium = match.stadium._id;
     const referee = match.referee._id;
     const firstLinesman = match.firstLinesman._id;
     const secondLinesman = match.secondLinesman._id;
+    const firstTeam = match.firstTeam._id;
+    const secondTeam = match.secondTeam._id;
 
     if (new Date(match.dateTime) < Date.now()){         //TODO: Maybe offset that a little?
         throw new AppError("Harry, you are a time traveller!", 400);
@@ -72,6 +75,12 @@ matchSchema.pre("save", async function (next) {
     const refereeExists = await Staff.exists({'_id': referee, 'type': "referee"});
     if (!firstLinesmanExists || !secondLinesmanExists || !refereeExists){
         throw new AppError("Staff not found", 400);
+    }
+
+    const firstTeamExists = await Team.exists({'_id': firstTeam});
+    const secondTeamExists = await Team.exists({'_id': secondTeam});
+    if (!firstTeamExists || !secondTeamExists){
+        throw new AppError("Team not found", 400);
     }
 
     const matchTime = 90;
@@ -108,7 +117,18 @@ matchSchema.pre("save", async function (next) {
         throw new AppError("Linesman occupied", 400);
     }
 
-    //TODO: team check
+    const teamOccupied = await Match.exists({
+        $or: [{'firstTeam': firstTeam},
+        {'firstTeam': secondTeam}, 
+        {'secondTeam': firstTeam},
+        {'secondTeam': secondTeam}],
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
+    });
+    if (teamOccupied){
+        throw new AppError("Team occupied", 400);
+    }
+
     next();
 });
 
