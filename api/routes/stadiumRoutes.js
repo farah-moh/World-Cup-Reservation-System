@@ -4,7 +4,7 @@ const stadiumController = require('./../controllers/stadium');
 
 const router = express.Router({mergeParams: true});
 
-//router.use(authenticationController.protectManager);
+router.use(authenticationController.protectManager);
 router.get('/', stadiumController.getStadia);
 router.get('/:id', stadiumController.getStadium);
 router.post('/', stadiumController.createStadium);

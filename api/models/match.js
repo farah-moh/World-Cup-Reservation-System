@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const AppError = require("../utils/appError");
 const Schema = mongoose.Schema;
 
 const matchSchema = mongoose.Schema(
@@ -13,12 +12,12 @@ const matchSchema = mongoose.Schema(
     firstTeam: {
         type: Schema.ObjectId,
         ref: 'team',
-        //required: true
+        required: true
     },
     secondTeam: {
         type: Schema.ObjectId,
         ref: 'team',
-        //required: true
+        required: true
     },
     referee: {
         type: Schema.ObjectId,
@@ -56,23 +55,23 @@ matchSchema.pre("save", async function (next) {
     const secondLinesman = match.secondLinesman._id;
 
     if (new Date(match.dateTime) < Date.now()){         //TODO: Maybe offset that a little?
-        throw new Error ("Harry, you are a time traveller!");
+        throw new AppError("Harry, you are a time traveller!", 400);
     }
 
     if (firstLinesman.equals(secondLinesman)){
-        throw new Error ("You stupid?");
+        throw new AppError("You stupid?", 400);
     }
 
     const stadiumExists = await Stadium.exists({"_id": stadium});
     if (!stadiumExists){
-        throw new Error ("Stadium not found");
+        throw new AppError("Stadium not found", 400);
     }
 
     const firstLinesmanExists = await Staff.exists({'_id': firstLinesman, 'type': "linesman"});
     const secondLinesmanExists = await Staff.exists({'_id': secondLinesman, 'type': "linesman"});
     const refereeExists = await Staff.exists({'_id': referee, 'type': "referee"});
     if (!firstLinesmanExists || !secondLinesmanExists || !refereeExists){
-        throw new Error ("Staff not found");
+        throw new AppError("Staff not found", 400);
     }
 
     const matchTime = 90;
@@ -81,18 +80,20 @@ matchSchema.pre("save", async function (next) {
 
     const stadiumOccupied = await Match.exists({
         'stadium' : stadium,
-        'dateTime' : {$gt: lower, $lt: upper} 
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
     });
     if (stadiumOccupied){
-        throw new Error ("Stadium is occupied");
+        throw new AppError("Stadium is occupied", 400);
     }
 
     const refereeOccupied = await Match.exists({
         'referee' : referee,
-        'dateTime' : {$gt: lower, $lt: upper} 
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
     });
     if (refereeOccupied){
-        throw new Error ("Referee is occupied");
+        throw new AppError("Referee is occupied", 400);
     }
 
     const linesmanOccupied = await Match.exists({
@@ -100,10 +101,11 @@ matchSchema.pre("save", async function (next) {
         {'firstLinesman': secondLinesman}, 
         {'secondLinesman': firstLinesman},
         {'secondLinesman': secondLinesman}],
-        'dateTime' : {$gt: lower, $lt: upper} 
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
     });
     if (linesmanOccupied){
-        throw new Error ("Linesman occupied");
+        throw new AppError("Linesman occupied", 400);
     }
 
     //TODO: team check

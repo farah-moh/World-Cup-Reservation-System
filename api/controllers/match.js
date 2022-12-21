@@ -64,10 +64,10 @@ exports.deleteMatch = catchAsync(async (req, res, next) => {
 exports.updateMatch = catchAsync(async (req, res, next) => {
     
     let match = req.params.id;
-    match = await Match.findByIdAndUpdate(match, req.body, {
-        new: true
-    });
+    match = await Match.findById(match);
     if(!match) throw new AppError('This match does not exists.',401);
+    await match.set(req.body);
+    await match.save();
 
     res.status(200).json({
         success: 'true',
