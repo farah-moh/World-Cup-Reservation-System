@@ -15,20 +15,22 @@ exports.getMatches = async (req, res) => {
         
     const matches = await Match.find({
         "dateTime": {$gte: fromDate, $lte: toDate}
-    });
+    });//.populate("stadium referee firstLinesman secondLinesman firstTeam secondTeam");
     res.send(matches);
 }
 
 exports.getFutureMatches = async (req, res) => {    
     const matches = await Match.find({
         'dateTime': { $gte: Date.now()}
-    });
+    });//.populate("stadium referee firstLinesman secondLinesman firstTeam secondTeam");
     res.send(matches);
 }
 
 exports.getMatch = async (req, res) => {
     try{
-        const match = await Match.findById(req.params.id);
+        const match = await Match.findById(req.params.id).populate("stadium referee firstLinesman secondLinesman firstTeam secondTeam");
+        if (!match)
+            throw Error("Match not found");
         res.send(match);
     }catch (err){
         res.status(400).send({ error: err.toString() });

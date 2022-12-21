@@ -48,15 +48,31 @@ const matchSchema = mongoose.Schema(
 
 matchSchema.pre("save", async function (next) {
     const Stadium = require("../models/stadium");
+    const Staff = require("../models/staff");
     const match = this;
     const stadium = match.stadium._id;
     const referee = match.referee._id;
     const firstLinesman = match.firstLinesman._id;
     const secondLinesman = match.secondLinesman._id;
 
-    const stadiumExists = await Stadium.exists(stadium);
+    if (new Date(match.dateTime) < Date.now()){         //TODO: Maybe offset that a little?
+        throw new Error ("Harry, you are a time traveller!");
+    }
+
+    if (firstLinesman.equals(secondLinesman)){
+        throw new Error ("You stupid?");
+    }
+
+    const stadiumExists = await Stadium.exists({"_id": stadium});
     if (!stadiumExists){
         throw new Error ("Stadium not found");
+    }
+
+    const firstLinesmanExists = await Staff.exists({'_id': firstLinesman, 'type': "linesman"});
+    const secondLinesmanExists = await Staff.exists({'_id': secondLinesman, 'type': "linesman"});
+    const refereeExists = await Staff.exists({'_id': referee, 'type': "referee"});
+    if (!firstLinesmanExists || !secondLinesmanExists || !refereeExists){
+        throw new Error ("Staff not found");
     }
 
     const matchTime = 90;

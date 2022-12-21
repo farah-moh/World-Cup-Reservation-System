@@ -10,10 +10,10 @@ exports.getStaff = async (req, res) => {
         const matchTime = 90;
         const lower = new Date(startDate.getTime() - matchTime * 60000);
         const upper = new Date(startDate.getTime() + matchTime * 60000);
-        
-        const allOccupied = await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("referee firstLinesman secondLinesman");
-        const notOccupied = await Staff.find({"_id" : {$nin : allOccupied}});
-        res.send(notOccupied);
+        const allOccupied = (await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("-_id referee firstLinesman secondLinesman"))
+        .map(el => Object.values(el.toObject())).flat();
+        const unoccupied = await Staff.find({"_id" : {$nin : allOccupied}});
+        res.send(unoccupied);
     } catch(err) {
         return res.status(400).json({ message: err.message });
     }
@@ -22,6 +22,8 @@ exports.getStaff = async (req, res) => {
 exports.getSingleStaff = async (req, res) => {
     try {
         const staff = await Staff.findById(req.params.id);
+        if (!staff)
+            throw Error("Staff not found");
         res.send(staff);
     } catch(err) {
         return res.status(400).json({ message: err.message });
