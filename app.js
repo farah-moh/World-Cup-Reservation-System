@@ -15,6 +15,7 @@ const matchRoutes = require("./api/routes/matchRoutes");
 const staffRoutes = require("./api/routes/staffRoutes");
 const stadiumRoutes = require("./api/routes/stadiumRoutes");
 const customerRoutes = require("./api/routes/customerRoutes");
+const teamRoutes = require("./api/routes/teamRoutes");
 
 require("dotenv").config();
 
@@ -53,6 +54,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/match", matchRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/stadium", stadiumRoutes);
+app.use("/api/team", teamRoutes);
 app.use("/api/", userRoutes);
 app.use("/api/", customerRoutes);
 

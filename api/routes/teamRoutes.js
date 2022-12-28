@@ -1,12 +1,12 @@
 const express = require('express');
 const authenticationController = require('./../controllers/authentication');
-const stadiumController = require('./../controllers/stadium');
+const teamController = require('./../controllers/team');
 
 const router = express.Router({mergeParams: true});
 
 router.use(authenticationController.protectManager);
-router.get('/', stadiumController.getStadia);
-router.get('/:id', stadiumController.getStadium);
-router.post('/', stadiumController.createStadium);
+router.get('/', teamController.getTeams);
+router.get('/:id', teamController.getTeam);
+router.post('/', teamController.createTeam);
 
 module.exports = router;

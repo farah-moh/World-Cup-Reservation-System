@@ -1,38 +1,35 @@
-const Staff = require("../models/staff");
+const Team = require("../models/team");
 
-const { model } = require("mongoose");
-const { findById } = require("../models/match");
-
-exports.getStaff = async (req, res) => {
+exports.getTeams = async (req, res) => {
     try {
         const Match = require("../models/match");
         const startDate = new Date(req.body.startDate);
         const matchTime = 90;
         const lower = new Date(startDate.getTime() - matchTime * 60000);
         const upper = new Date(startDate.getTime() + matchTime * 60000);
-        const allOccupied = (await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("-_id referee firstLinesman secondLinesman"))
+        const allOccupied = (await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("-_id firstTeam secondTeam"))
         .map(el => Object.values(el.toObject())).flat();
-        const unoccupied = await Staff.find({"_id" : {$nin : allOccupied}});
+        const unoccupied = await Team.find({"_id" : {$nin : allOccupied}});
         res.send(unoccupied);
     } catch(err) {
         return res.status(400).json({ message: err.message });
     }
 }
 
-exports.getSingleStaff = async (req, res) => {
+exports.getTeam = async (req, res) => {
     try {
-        const staff = await Staff.findById(req.params.id);
-        if (!staff)
-            throw Error("Staff not found");
-        res.send(staff);
+        const team = await Team.findById(req.params.id);
+        if (!team)
+            throw Error("Team not found");
+        res.send(team);
     } catch(err) {
         return res.status(400).json({ message: err.message });
     }
 }
 
-exports.createStaff = async (req, res) => {
+exports.createTeam = async (req, res) => {
     try{
-        const staff = await Staff.create(req.body);
+        const staff = await Team.create(req.body);
         return res.send(staff);
     } catch (err) {
         return res.status(400).json({ message: err.message });

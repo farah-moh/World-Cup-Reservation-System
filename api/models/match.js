@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const AppError = require("../utils/appError");
 const Schema = mongoose.Schema;
 
 const matchSchema = mongoose.Schema(
@@ -13,12 +12,12 @@ const matchSchema = mongoose.Schema(
     firstTeam: {
         type: Schema.ObjectId,
         ref: 'team',
-        //required: true
+        required: true
     },
     secondTeam: {
         type: Schema.ObjectId,
         ref: 'team',
-        //required: true
+        required: true
     },
     referee: {
         type: Schema.ObjectId,
@@ -48,15 +47,40 @@ const matchSchema = mongoose.Schema(
 
 matchSchema.pre("save", async function (next) {
     const Stadium = require("../models/stadium");
+    const Staff = require("../models/staff");
+    const Team = require("../models/team");
     const match = this;
     const stadium = match.stadium._id;
     const referee = match.referee._id;
     const firstLinesman = match.firstLinesman._id;
     const secondLinesman = match.secondLinesman._id;
+    const firstTeam = match.firstTeam._id;
+    const secondTeam = match.secondTeam._id;
 
-    const stadiumExists = await Stadium.exists(stadium);
+    if (new Date(match.dateTime) < Date.now()){         //TODO: Maybe offset that a little?
+        throw new AppError("Harry, you are a time traveller!", 400);
+    }
+
+    if (firstLinesman.equals(secondLinesman) || firstTeam.equals(secondTeam)){
+        throw new AppError("You stupid?", 400);
+    }
+
+    const stadiumExists = await Stadium.exists({"_id": stadium});
     if (!stadiumExists){
-        throw new Error ("Stadium not found");
+        throw new AppError("Stadium not found", 400);
+    }
+
+    const firstLinesmanExists = await Staff.exists({'_id': firstLinesman, 'type': "linesman"});
+    const secondLinesmanExists = await Staff.exists({'_id': secondLinesman, 'type': "linesman"});
+    const refereeExists = await Staff.exists({'_id': referee, 'type': "referee"});
+    if (!firstLinesmanExists || !secondLinesmanExists || !refereeExists){
+        throw new AppError("Staff not found", 400);
+    }
+
+    const firstTeamExists = await Team.exists({'_id': firstTeam});
+    const secondTeamExists = await Team.exists({'_id': secondTeam});
+    if (!firstTeamExists || !secondTeamExists){
+        throw new AppError("Team not found", 400);
     }
 
     const matchTime = 90;
@@ -65,18 +89,20 @@ matchSchema.pre("save", async function (next) {
 
     const stadiumOccupied = await Match.exists({
         'stadium' : stadium,
-        'dateTime' : {$gt: lower, $lt: upper} 
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
     });
     if (stadiumOccupied){
-        throw new Error ("Stadium is occupied");
+        throw new AppError("Stadium is occupied", 400);
     }
 
     const refereeOccupied = await Match.exists({
         'referee' : referee,
-        'dateTime' : {$gt: lower, $lt: upper} 
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
     });
     if (refereeOccupied){
-        throw new Error ("Referee is occupied");
+        throw new AppError("Referee is occupied", 400);
     }
 
     const linesmanOccupied = await Match.exists({
@@ -84,13 +110,25 @@ matchSchema.pre("save", async function (next) {
         {'firstLinesman': secondLinesman}, 
         {'secondLinesman': firstLinesman},
         {'secondLinesman': secondLinesman}],
-        'dateTime' : {$gt: lower, $lt: upper} 
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
     });
     if (linesmanOccupied){
-        throw new Error ("Linesman occupied");
+        throw new AppError("Linesman occupied", 400);
     }
 
-    //TODO: team check
+    const teamOccupied = await Match.exists({
+        $or: [{'firstTeam': firstTeam},
+        {'firstTeam': secondTeam}, 
+        {'secondTeam': firstTeam},
+        {'secondTeam': secondTeam}],
+        'dateTime' : {$gt: lower, $lt: upper},
+        '_id': {$ne: match._id}
+    });
+    if (teamOccupied){
+        throw new AppError("Team occupied", 400);
+    }
+
     next();
 });
 
