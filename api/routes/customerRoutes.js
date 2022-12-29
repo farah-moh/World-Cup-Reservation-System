@@ -8,5 +8,6 @@ router.use(authenticationController.protect);
 
 router.get('/:username/reservations',customerController.getReservations);
 router.post('/reserve',customerController.reserveTicket);
+router.delete('/cancel-reservation',customerController.cancelTicket);
 
 module.exports = router;

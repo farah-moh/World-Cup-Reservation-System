@@ -78,3 +78,48 @@ exports.reserveTicket = catchAsync(async (req, res, next) => {
         success: 'true'
     });
 });
+
+exports.cancelTicket = catchAsync(async (req, res, next) => {
+    //getting user in route params
+    let me = req.user._id;
+    let currTicket = req.body.ticket;
+    let threeDays = 1000 * 3600 * 24 * 3;
+
+    currTicket =  await ticket.findById(currTicket);
+    if(!currTicket) throw new AppError('This ticket does not exists.',401);
+    if(currTicket.buyer.toString() != me) {
+        return res.status(400).json({
+            success: 'false',
+            error: "This ticket doesn't belong to this user"
+        });
+    }
+
+    let currMatch = await match.findById(currTicket.match);
+    let nowDate = new Date();
+    let ticketDate = Date.parse(currMatch.dateTime);
+
+    if(ticketDate < nowDate) {
+        return res.status(400).json({
+            success: 'false',
+            error: "This ticket is expired. Match has already passed."
+        });
+    }
+
+    if(ticketDate - nowDate <= threeDays) {
+        return res.status(400).json({
+            success: 'false',
+            error: "You can't cancel now. Match is in 3 days (or less)"
+        });
+    }
+
+    currMatch.seats = currMatch.seats.filter(item => item != currTicket.seatNumber);
+
+    await currMatch.save();
+
+    await ticket.findByIdAndDelete(currTicket._id);
+
+
+    res.status(200).json({
+        success: 'true'
+    });
+});
