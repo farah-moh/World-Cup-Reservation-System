@@ -20,6 +20,9 @@ const stadiumSchema = mongoose.Schema(
     seatsPerRow: {
         type: Number,
         required: true
+    },
+    name: {
+      type: String
     }
   },
   { timestamps: { createdAt: "created_at" } }

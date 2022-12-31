@@ -9,6 +9,9 @@ const teamSchema = mongoose.Schema(
       unique: true,
       type: String,
       required: true
+    },
+    flag: {
+      type: String
     }
   },
   { timestamps: { createdAt: "created_at" } }

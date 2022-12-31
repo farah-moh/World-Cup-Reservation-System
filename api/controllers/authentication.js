@@ -73,7 +73,7 @@ const protectServiceAdmin = async req => {
     if(!foundUser) {
       throw new AppError('The user belonging to this token no longer exists', 401);
     }
-    if(foundUser.role !== 'manager') {
+    if(foundUser.role !== 'manager' || foundUser.isApproved == false) {
       throw new AppError('The user is not a manager', 401);
     }
     req.user = foundUser;
