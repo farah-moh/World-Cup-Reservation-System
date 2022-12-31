@@ -4,9 +4,9 @@ const { model } = require("mongoose");
 exports.getStadia = async (req, res) => {
     try{
         const Match = require("../models/match");
-        var startDate = new Date(req.query.startDate)
-        startDate.setHours(startDate.getHours()+2)
-        // const startDate = new Date(req.query.startDate);
+        // var startDate = new Date(req.query.startDate)
+        // startDate.setHours(startDate.getHours()+2)
+        const startDate = new Date(req.query.startDate);
         const matchTime = 90;
         const lower = new Date(startDate.getTime() - matchTime * 60000);
         const upper = new Date(startDate.getTime() + matchTime * 60000);

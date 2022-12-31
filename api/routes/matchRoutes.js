@@ -5,7 +5,7 @@ const matchController = require('./../controllers/match');
 const router = express.Router({mergeParams: true});
 
 router.get('/:id', matchController.getMatch);
-router.get('/', matchController.getFutureMatches);
+router.get('/', matchController.getMatches);
 
 router.use(authenticationController.protectManager); 
 router.post('/create', matchController.createMatch);
