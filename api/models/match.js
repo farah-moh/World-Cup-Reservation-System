@@ -39,7 +39,7 @@ const matchSchema = mongoose.Schema(
         required: true
     },
     seats: [{
-        type: Number
+        type: String
     }],
   },
   { timestamps: { createdAt: "created_at" } },
