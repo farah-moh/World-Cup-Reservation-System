@@ -10,21 +10,21 @@ exports.getMatches = async (req, res) => {
     let fromDate = new Date(-8640000000000000); //they aren't looking at code right? yes lol
     let toDate = new Date(8640000000000000);
 
-    if (req.body.hasOwnProperty('fromDate'))
-        fromDate = new Date(req.body.fromDate);
-    if (req.body.hasOwnProperty('toDate'))
-        toDate = new Date(req.body.toDate);
+    if (req.query.hasOwnProperty('fromDate'))
+        fromDate = new Date(req.query.fromDate);
+    if (req.query.hasOwnProperty('toDate'))
+        toDate = new Date(req.query.toDate);
         
     const matches = await Match.find({
         "dateTime": {$gte: fromDate, $lte: toDate}
-    });//.populate("stadium referee firstLinesman secondLinesman firstTeam secondTeam");
+    }).populate("firstTeam secondTeam dateTime");
     res.send(matches);
 }
 
 exports.getFutureMatches = async (req, res) => {    
     const matches = await Match.find({
         'dateTime': { $gte: Date.now()}
-    });//.populate("stadium referee firstLinesman secondLinesman firstTeam secondTeam");
+    }).populate("firstTeam secondTeam dateTime");
     res.send(matches);
 }
 

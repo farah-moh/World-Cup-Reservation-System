@@ -4,12 +4,22 @@ const { model } = require("mongoose");
 exports.getStadia = async (req, res) => {
     try{
         const Match = require("../models/match");
-        const startDate = new Date(req.body.startDate);
+        // var startDate = new Date(req.query.startDate)
+        // startDate.setHours(startDate.getHours()+2)
+        const startDate = new Date(req.query.startDate);
         const matchTime = 90;
         const lower = new Date(startDate.getTime() - matchTime * 60000);
         const upper = new Date(startDate.getTime() + matchTime * 60000);
-        
-        const allOccupied = await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("stadium").distinct("stadium");
+
+        let allOccupied = null
+        if (req.query.hasOwnProperty('excludedId')){
+            const excludedId = req.query.excludedId
+            allOccupied = await Match.find({"dateTime": {$gt: lower, $lt: upper}, "_id" : {$ne : excludedId}}).select("stadium").distinct("stadium");
+        }
+        else
+        {
+            allOccupied = await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("stadium").distinct("stadium");
+        }
         const unoccupied = await Stadium.find({'_id' : {$nin : allOccupied}});
         res.send(unoccupied);
     } catch(err) {
