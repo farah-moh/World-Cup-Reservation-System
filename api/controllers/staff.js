@@ -9,7 +9,7 @@ exports.getStaff = async (req, res) => {
         // var startDate = new Date(req.query.startDate)
         // startDate.setHours(startDate.getHours()+2)
         const startDate = new Date(req.query.startDate);
-        const matchTime = 90;
+        const matchTime = 180;
         const lower = new Date(startDate.getTime() - matchTime * 60000);
         const upper = new Date(startDate.getTime() + matchTime * 60000);
 
