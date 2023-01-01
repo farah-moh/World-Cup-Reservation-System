@@ -32,7 +32,7 @@ exports.reserveTicket = catchAsync(async (req, res, next) => {
     //getting user in route params
     let me = req.user._id;
     let matchID = req.body.matchID;
-    let seat = req.body.seat;
+    let seats = req.body.seats;
 
     let currMatch = await match.findById(matchID);
     if(!currMatch) throw new AppError('This match does not exists.',401);
@@ -56,23 +56,27 @@ exports.reserveTicket = catchAsync(async (req, res, next) => {
         });
     }
 
-    if(matchSeats.includes(seat)) {
-        return res.status(400).json({
-            success: 'false',
-            error: 'This seat is already booked'
-        });
-    }
-
-    currMatch.seats.push(seat);
-    await currMatch.save();
-
-    const newTicket = await ticket.create({
-        buyer: me,
-        match: matchID,
-        seatNumber: seat
+    seats.forEach(seat => {
+        if(matchSeats.includes(seat)) {
+            return res.status(400).json({
+                success: 'false',
+                error: 'This seat is already booked'
+            });
+        }
     });
 
-    await newTicket.save();
+    seats.forEach(async (seat) => {
+        currMatch.seats.push(seat);
+        
+        const newTicket = await ticket.create({
+            buyer: me,
+            match: matchID,
+            seatNumber: seat
+        });
+        
+        await newTicket.save();
+    });
+    await currMatch.save();
 
     res.status(200).json({
         success: 'true'

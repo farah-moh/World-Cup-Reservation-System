@@ -5,14 +5,6 @@ const Schema = mongoose.Schema;
 
 const stadiumSchema = mongoose.Schema(
   {
-    length: {
-      type: Number,
-      required: true
-    },
-    width: {
-        type: Number,
-        required: true
-    },
     rows: {
         type: Number,
         required: true
@@ -22,7 +14,9 @@ const stadiumSchema = mongoose.Schema(
         required: true
     },
     name: {
-      type: String
+      unique: true,
+      type: String,
+      required: true
     }
   },
   { timestamps: { createdAt: "created_at" } }
