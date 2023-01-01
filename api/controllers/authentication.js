@@ -4,6 +4,27 @@ const AppError = require('../utils/appError');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 
+exports.changePassword = catchAsync(async (req, res, next) => {
+  const id = req.body.id;
+  const password = req.body.password;
+  const newPassword = req.body.newPassword;
+
+  const currUser = await user.findOne({_id: id});
+
+  if (!currUser) throw new AppError("This user doesn't exist", 400);
+
+  if (!(await currUser.comparePassword(password, currUser.password))) 
+      throw new AppError('This password is incorrect', 401);
+
+  currUser.password = newPassword;
+
+  await currUser.save();
+  res.status(200).json({
+    status: 'Success'
+  })
+});
+
+
 /* Services */
 
 const protectService = async req => {
