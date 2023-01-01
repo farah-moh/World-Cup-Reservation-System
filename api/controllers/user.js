@@ -37,6 +37,7 @@ exports.updateUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.userData._id);
 
+    const updates = Object.keys(req.body);
     updates.forEach((element) => (user[element] = req.body[element]));
 
     await user.save();
