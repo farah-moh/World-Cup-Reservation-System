@@ -17,9 +17,9 @@ exports.getReservations = catchAsync(async (req, res, next) => {
     // get reservations
     let reservations = [];
     for (const element of userTickets) {
-        let currMatch =  await match.findById(element.match).select('-seats');
-        const tempReservation = currMatch;
-        tempReservation["seat"] = element.seatNumber;
+        let currMatch =  await match.findById(element.match).populate("firstTeam secondTeam").select('-seats');
+        const tempReservation = {...currMatch._doc, ticketId:element._id, seat:element.seatNumber};
+        // tempReservation["seat"] = element.seatNumber;
         reservations.push(tempReservation);
     }
     res.status(200).json({
@@ -88,7 +88,7 @@ exports.cancelTicket = catchAsync(async (req, res, next) => {
     let me = req.user._id;
     let currTicket = req.body.ticket;
     let threeDays = 1000 * 3600 * 24 * 3;
-
+    console.log(currTicket)
     currTicket =  await ticket.findById(currTicket);
     if(!currTicket) throw new AppError('This ticket does not exists.',401);
     if(currTicket.buyer.toString() != me) {
