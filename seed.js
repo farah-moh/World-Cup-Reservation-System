@@ -4,20 +4,81 @@ const seeder = require('mongoose');
 const Team = require('./api/models/team');
 const Match = require('./api/models/match');
 const User = require('./api/models/user');
+const Staff = require('./api/models/staff');
+const Stadium = require('./api/models/stadium');
  
 // Connect to MongoDB via Mongoose
 seeder.connect(process.env.MONGO_URL_LOCAL)
 seeder.connection.on("connected", async () => {
-    await Team.deleteMany()
-    await Match.deleteMany()
-    await Team.insertMany(data)
+    console.log("mongodb connection established successfully");
+    // await Team.deleteMany()
+    // await Match.deleteMany()
+    // await Team.insertMany(data)
+    await Staff.insertMany(staff)
+    await Stadium.insertMany(stadiums)
     // await User.create({ ...admin, verified: true });
     seeder.disconnect()
-    console.log("mongodb connection established successfully");
   });
 seeder.connection.on("error", () => {
     console.log("mongodb connection Failed");
 });
+var stadiums = [
+    {
+        name:"Al-Bayt",
+        rows:4,
+        seatsPerRow:6
+    },
+    {
+        name:"Lusail",
+        rows:5,
+        seatsPerRow:6
+    },
+    {
+        name:"Al-Thumama",
+        rows:4,
+        seatsPerRow:7
+    }
+]
+var staff = [
+    {
+        name:"Referee1",
+        type:"referee"
+    },
+    {
+        name:"Referee2",
+        type:"referee"
+    },
+    {
+        name:"Referee3",
+        type:"referee"
+    },
+    {
+        name:"Linesman1",
+        type:"linesman"
+    },
+    {
+        name:"Linesman2",
+        type:"linesman"
+    },
+    {
+        name:"Linesman3",
+        type:"linesman"
+    },
+    {
+        name:"Linesman4",
+        type:"linesman"
+    },
+    {
+        name:"Linesman5",
+        type:"linesman"
+    },
+    {
+        name:"Linesman6",
+        type:"linesman"
+    },
+
+]
+
 var admin = {
     "username": "admin",
     "firstName": "admin",
