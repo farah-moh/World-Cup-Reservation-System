@@ -1,21 +1,35 @@
 require("dotenv").config();
 const { match } = require("assert");
 const seeder = require('mongoose');
-const team = require('./api/models/team');
-const match = require('./api/models/match');
+const Team = require('./api/models/team');
+const Match = require('./api/models/match');
+const User = require('./api/models/user');
  
 // Connect to MongoDB via Mongoose
 seeder.connect(process.env.MONGO_URL_LOCAL)
 seeder.connection.on("connected", async () => {
-    await team.deleteMany()
-    await match.deleteMany()
-    await team.insertMany(data)
+    await Team.deleteMany()
+    await Match.deleteMany()
+    await Team.insertMany(data)
+    // await User.create({ ...admin, verified: true });
     seeder.disconnect()
     console.log("mongodb connection established successfully");
   });
 seeder.connection.on("error", () => {
     console.log("mongodb connection Failed");
 });
+var admin = {
+    "username": "admin",
+    "firstName": "admin",
+    "lastName": "admin",
+    "email": "admin@gmail.com",
+    "password": "admin123",
+    "birthdate": "2001-07-26",
+    "gender" : "M",
+    "nationality": "admin",
+    "role": "admin",
+    "isApproved":true
+}
 var data = [
     {
         'name': 'Costa Rica',

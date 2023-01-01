@@ -17,12 +17,14 @@ exports.approveUser = catchAsync(async (req, res, next) => {
 
 const deleteUserReservations = async(userID) => {
     let userTickets = await ticket.find({'buyer': userID});
-    
-    for (const element of userTickets) {
-        let currMatch =  await match.findById(element.match);
-        currMatch.seats = currMatch.seats.filter(item => item != element.seatNumber);
-        await currMatch.save();
-        await ticket.findByIdAndDelete(element._id);
+    if(userTickets)
+    {
+        for (const element of userTickets) {
+            let currMatch =  await match.findById(element.match);
+            currMatch.seats = currMatch.seats.filter(item => item != element.seatNumber);
+            await currMatch.save();
+            await ticket.findByIdAndDelete(element._id);
+        }
     }
 }
 
@@ -43,7 +45,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 exports.getUnapprovedUsers = catchAsync(async (req, res, next) => {
     //getting user in route params
-    const users = await user.find({'isApproved': false});
+    const users = await user.find({'isApproved': false, 'role': 'manager'});
 
     res.status(200).json({
         success: 'true',
@@ -53,7 +55,7 @@ exports.getUnapprovedUsers = catchAsync(async (req, res, next) => {
 
 exports.getUsers = catchAsync(async (req, res, next) => {
     //getting user in route params
-    const users = await user.find();
+    const users = await user.find({'role' : {$ne : 'admin'}});
 
     res.status(200).json({
         success: 'true',
