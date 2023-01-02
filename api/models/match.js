@@ -83,7 +83,7 @@ matchSchema.pre("save", async function (next) {
         throw new AppError("Team not found", 400);
     }
 
-    const matchTime = 90;
+    const matchTime = 180;
     const lower = new Date(match.dateTime.getTime() - matchTime * 60000);
     const upper = new Date(match.dateTime.getTime() + matchTime * 60000);
 
