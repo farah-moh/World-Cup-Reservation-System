@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-const UserVerification = require("../models/userVerfication");
 const { model } = require("mongoose");
 
 exports.getMatches = async (req, res) => {

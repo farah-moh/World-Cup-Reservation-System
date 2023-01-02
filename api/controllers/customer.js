@@ -33,10 +33,11 @@ exports.reserveTicket = catchAsync(async (req, res, next) => {
     let me = req.user._id;
     let matchID = req.body.matchID;
     let seats = req.body.seats;
+    let threeHours = 1000 * 3600 * 3;
 
     let currMatch = await match.findById(matchID);
     if(!currMatch) throw new AppError('This match does not exists.',401);
-    let date = currMatch.dateTime;
+    let date = Date.parse(currMatch.dateTime);
 
     // get tickets bought by user
     let userTickets = await ticket.find({'buyer': me}).select('match');
@@ -44,9 +45,13 @@ exports.reserveTicket = catchAsync(async (req, res, next) => {
 
     // get dates of matches booked by user
     let clashes = 0;
+    console.log(date);
     for (const element of userTickets) {
         let tempMatch =  await match.findById(element.match).select('dateTime _id');
-        if(tempMatch.dateTime.toString() == date) clashes++;
+        if(tempMatch._id == matchID) continue;
+        let tempDate = Date.parse(tempMatch.dateTime);
+        console.log(tempDate);
+        if(Math.abs(tempDate-date) < threeHours) clashes++;
     }
 
     if(clashes) {
