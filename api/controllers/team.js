@@ -9,17 +9,31 @@ exports.getTeams = async (req, res) => {
         const matchTime = 180;
         const lower = new Date(startDate.getTime() - matchTime * 60000);
         const upper = new Date(startDate.getTime() + matchTime * 60000);
-        
+
+        const todayStart = new Date(new Date(startDate).setHours(0, 0, 0, 0));
+        const todayEnd = new Date(new Date(startDate).setHours(23, 59, 59, 999));
+
         let allOccupied = null
         if (req.query.hasOwnProperty('excludedId')){
             const excludedId = req.query.excludedId
-            allOccupied = (await Match.find({"dateTime": {$gt: lower, $lt: upper}, "_id" : {$ne : excludedId}}).select("-_id firstTeam secondTeam"))
+            allOccupied = (await Match.find(
+                {
+                    $or:[{"dateTime": {$gt: lower, $lt: upper}},
+                    {"dateTime": {$gt: todayStart, $lt: todayEnd}}],
+                    "_id" : {$ne : excludedId}
+                }
+                ).select("-_id firstTeam secondTeam"))
             .map(el => Object.values(el.toObject())).flat();
         }
         else{
-            allOccupied = (await Match.find({"dateTime": {$gt: lower, $lt: upper}}).select("-_id firstTeam secondTeam"))
+            allOccupied = (await Match.find(
+                {$or:[{"dateTime": {$gt: lower, $lt: upper}},
+                {"dateTime": {$gt: todayStart, $lt: todayEnd}}]})
+            .select("-_id firstTeam secondTeam"))
             .map(el => Object.values(el.toObject())).flat();
         }
+
+
         
         const unoccupied = await Team.find({"_id" : {$nin : allOccupied}});
         res.send(unoccupied);

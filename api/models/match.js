@@ -106,24 +106,32 @@ matchSchema.pre("save", async function (next) {
     }
 
     const linesmanOccupied = await Match.exists({
-        $or: [{'firstLinesman': firstLinesman},
-        {'firstLinesman': secondLinesman}, 
-        {'secondLinesman': firstLinesman},
-        {'secondLinesman': secondLinesman}],
-        'dateTime' : {$gt: lower, $lt: upper},
-        '_id': {$ne: match._id}
+        $and:[
+            {$or: [{'firstLinesman': firstLinesman},
+            {'firstLinesman': secondLinesman}, 
+            {'secondLinesman': firstLinesman},
+            {'secondLinesman': secondLinesman}],
+            'dateTime' : {$gt: lower, $lt: upper}},
+            {'_id': {$ne: match._id}}
+        ]
     });
     if (linesmanOccupied){
         throw new AppError("Linesman occupied", 400);
     }
 
-    const teamOccupied = await Match.exists({
-        $or: [{'firstTeam': firstTeam},
+    const todayStart = new Date(new Date(match.dateTime).setHours(0, 0, 0, 0));
+    const todayEnd = new Date(new Date(match.dateTime).setHours(23, 59, 59, 999));
+
+    const teamOccupied = await Match.findOne({
+        $and:[
+        {$or: [{'firstTeam': firstTeam},
         {'firstTeam': secondTeam}, 
         {'secondTeam': firstTeam},
-        {'secondTeam': secondTeam}],
-        'dateTime' : {$gt: lower, $lt: upper},
-        '_id': {$ne: match._id}
+        {'secondTeam': secondTeam}]},
+        {$or: [{'dateTime' : {$gt: lower, $lt: upper}},
+            {"dateTime": {$gt: todayStart, $lt: todayEnd}}]},
+        {'_id': {$ne: match._id}}
+        ]
     });
     if (teamOccupied){
         throw new AppError("Team occupied", 400);

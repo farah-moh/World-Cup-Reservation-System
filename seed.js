@@ -13,10 +13,17 @@ seeder.connection.on("connected", async () => {
     console.log("mongodb connection established successfully");
     // await Team.deleteMany()
     // await Match.deleteMany()
+    await User.deleteMany()
+    // await Stadium.deleteMany()
+    // await Staff.deleteMany()
     // await Team.insertMany(data)
-    await Staff.insertMany(staff)
-    await Stadium.insertMany(stadiums)
-    // await User.create({ ...admin, verified: true });
+    // await Staff.insertMany(staff)
+    // await Stadium.insertMany(stadiums)
+    for(const user of users)
+    {
+        await User.create(user);
+    }
+    
     seeder.disconnect()
   });
 seeder.connection.on("error", () => {
@@ -79,22 +86,72 @@ var staff = [
 
 ]
 
-var admin = {
-    "username": "admin",
-    "firstName": "admin",
-    "lastName": "admin",
-    "email": "admin@gmail.com",
-    "password": "admin123",
-    "birthdate": "2001-07-26",
-    "gender" : "M",
-    "nationality": "admin",
-    "role": "admin",
-    "isApproved":true
-}
-var data = [
+var users = [
+    {
+        "username": "admin",
+        "firstName": "admin",
+        "lastName": "admin",
+        "email": "admin@gmail.com",
+        "password": "admin123",
+        "birthdate": "2001-07-26",
+        "gender" : "M",
+        "nationality": "admin",
+        "role": "admin",
+        "verified": true,
+        "isApproved":true
+    },
+    {
+        "username": "managerA",
+        "firstName": "managerA",
+        "lastName": "managerA",
+        "email": "managerA@gmail.com",
+        "password": "manager123",
+        "birthdate": "2003-02-06",
+        "gender" : "M",
+        "nationality": "manager",
+        "role": "manager",
+        "verified": true,
+        "isApproved":false
+    },
+    {
+        "username": "manager",
+        "firstName": "manager",
+        "lastName": "manager",
+        "email": "manager@gmail.com",
+        "password": "manager123",
+        "birthdate": "2001-05-26",
+        "gender" : "M",
+        "nationality": "manager",
+        "role": "manager",
+        "verified": true,
+        "isApproved":false
+    },
+    {
+        "username": "customer",
+        "firstName": "customer",
+        "lastName": "customer",
+        "email": "customer@gmail.com",
+        "password": "customer123",
+        "birthdate": "2001-11-12",
+        "gender" : "M",
+        "nationality": "customer",
+        "role": "customer",
+        "verified": true,
+        "isApproved":false
+    },
+]
+    var data = [
     {
         'name': 'Costa Rica',
         'flag': "https://www.sciencekids.co.nz/images/pictures/flags680/Costa_Rica.jpg"
+    },
+    {
+        'name': 'Wales',
+        'flag': "https://www.sciencekids.co.nz/images/pictures/flags680/Wales.jpg"
+    },
+    {
+        'name': 'Serbia',
+        'flag': "https://www.sciencekids.co.nz/images/pictures/flags680/Serbia.jpg"
     },
     {
         'name': 'Saudi Arabia',
